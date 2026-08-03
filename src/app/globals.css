@@ -1,0 +1,35 @@
+:root {
+  --color-navy: #001327;
+  --color-teal: #19a4c2;
+  --color-amber: #cdd44b;
+  --color-deep-teal: #093a4f;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: var(--color-navy);
+  background: var(--color-navy);
+  font-family: var(--font-cairo), "Cairo", Tahoma, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+}

@@ -1,0 +1,134 @@
+.wrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 44%, rgba(34, 224, 225, 0.2), rgba(4, 87, 119, 0.08) 35%, transparent 65%),
+    linear-gradient(180deg, #19c9ce 0%, #078fa7 30%, #05627f 58%, #032f55 82%, #011b38 100%);
+}
+
+.oceanCanvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.oceanDepth {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle at 50% 32%,
+      rgba(60, 232, 228, 0.18) 0%,
+      rgba(4, 125, 157, 0.07) 34%,
+      transparent 62%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(38, 215, 218, 0.045) 0%,
+      rgba(4, 105, 139, 0.11) 55%,
+      rgba(1, 22, 47, 0.34) 100%
+    );
+}
+
+.oceanFog {
+  position: absolute;
+  inset: 25% -10% -10%;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 30% 45%, rgba(97, 225, 229, 0.085), transparent 55%),
+    radial-gradient(ellipse at 75% 60%, rgba(34, 154, 185, 0.07), transparent 58%);
+  filter: blur(40px);
+  animation: ocean-fog-drift 18s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+.atmosphere {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 44%, rgba(34, 224, 225, 0.12), rgba(4, 87, 119, 0.035) 38%, transparent 67%),
+    linear-gradient(90deg, rgba(1, 22, 47, 0.1), transparent 17%, transparent 83%, rgba(1, 22, 47, 0.12));
+  mix-blend-mode: screen;
+}
+
+.plankton {
+  position: absolute;
+  inset: 0;
+  opacity: 0.62;
+}
+
+.plankton i {
+  position: absolute;
+  left: var(--particle-x);
+  top: var(--particle-y);
+  width: var(--particle-size);
+  height: var(--particle-size);
+  border-radius: 50%;
+  background: rgba(221, 255, 252, 0.5);
+  box-shadow: 0 0 5px rgba(162, 255, 247, 0.3);
+  opacity: var(--particle-opacity);
+  animation: plankton-drift var(--particle-duration) ease-in-out infinite alternate;
+  animation-delay: var(--particle-delay);
+}
+
+.nearParticle {
+  filter: blur(0.45px);
+  box-shadow: 0 0 7px rgba(162, 255, 247, 0.34);
+}
+
+.farParticle {
+  box-shadow: 0 0 3px rgba(162, 255, 247, 0.2);
+}
+
+@keyframes plankton-drift {
+  from {
+    translate: -4px 7px;
+  }
+  to {
+    translate: 7px -12px;
+  }
+}
+
+@keyframes ocean-fog-drift {
+  from {
+    transform: translate3d(-1.5%, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(1.5%, 1%, 0) scale(1.04);
+  }
+}
+
+@media (max-width: 768px) {
+  .plankton i:nth-child(n + 16) {
+    display: none;
+  }
+
+  .atmosphere {
+    background:
+      radial-gradient(circle at 50% 42%, rgba(34, 224, 225, 0.1), transparent 62%),
+      linear-gradient(90deg, rgba(1, 22, 47, 0.08), transparent 22%, transparent 78%, rgba(1, 22, 47, 0.1));
+  }
+
+  .oceanFog {
+    inset: 30% -6% -6%;
+    opacity: 0.56;
+    filter: blur(24px);
+  }
+
+  .nearParticle {
+    filter: blur(0.25px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plankton i,
+  .oceanFog {
+    animation: none;
+  }
+}

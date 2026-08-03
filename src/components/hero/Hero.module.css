@@ -1,0 +1,140 @@
+.hero {
+  position: relative;
+  width: 100%;
+  height: 100svh;
+  min-height: 560px;
+  overflow: hidden;
+  background: #dcebe8;
+  isolation: isolate;
+}
+
+.heroGiantTitle {
+  --title-x: 0px;
+  --title-y: 0px;
+  position: absolute;
+  top: 50%;
+  right: clamp(24px, 5vw, 90px);
+  bottom: auto;
+  left: auto;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  margin: 0;
+  width: min(82vw, 1250px);
+  padding: 0;
+  overflow: visible;
+  color: #5f6875;
+  font-family: var(--font-cairo), "Cairo", sans-serif;
+  font-size: clamp(58px, 8.2vw, 138px);
+  font-weight: 700;
+  line-height: 0.96;
+  letter-spacing: -0.035em;
+  direction: rtl;
+  text-align: right;
+  text-shadow: 0 6px 24px rgba(0, 19, 39, 0.1);
+  transform: translate3d(var(--title-x), calc(-46% + var(--title-y)), 0);
+  transition: transform 220ms ease-out;
+  pointer-events: none;
+  user-select: none;
+  opacity: 1;
+  visibility: visible;
+}
+
+.heroGiantTitle span {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin-right: 0;
+  margin-left: auto;
+  color: #5f6875;
+  white-space: nowrap;
+  text-align: right;
+  transform: none;
+}
+
+.heroGiantTitle span + span {
+  margin-top: 0.08em;
+}
+
+.heroGiantTitle span:nth-child(1) {
+  margin-left: auto;
+}
+
+.heroGiantTitle span:nth-child(2) {
+  margin-right: 7%;
+  margin-left: auto;
+}
+
+.heroGiantTitle span:nth-child(3) {
+  margin-right: 18%;
+  margin-left: auto;
+}
+
+.canvasLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 8;
+}
+
+.oceanVignette {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 48%,
+    rgba(1, 30, 57, 0.1) 76%,
+    rgba(1, 19, 39, 0.2) 100%
+  );
+}
+
+@media (max-width: 768px) {
+  .heroGiantTitle {
+    right: 18px;
+    left: auto;
+    width: calc(100% - 36px);
+    align-items: flex-end;
+    padding: 0;
+    font-size: clamp(44px, 14vw, 78px);
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+    text-align: right;
+    transform: translate3d(var(--title-x), calc(-44% + var(--title-y)), 0);
+  }
+
+  .heroGiantTitle span {
+    margin-left: auto;
+    white-space: normal;
+    text-align: right;
+  }
+
+  .heroGiantTitle span + span {
+    margin-top: 0.14em;
+  }
+
+  .oceanVignette {
+    background: radial-gradient(
+      ellipse at center,
+      transparent 54%,
+      rgba(1, 30, 57, 0.07) 80%,
+      rgba(1, 19, 39, 0.14) 100%
+    );
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heroGiantTitle {
+    transform: translateY(-46%);
+    transition: none;
+  }
+}
+
+@media (max-width: 768px) and (prefers-reduced-motion: reduce) {
+  .heroGiantTitle {
+    transform: translateY(-44%);
+  }
+}

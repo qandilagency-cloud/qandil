@@ -1,0 +1,15 @@
+.root { position: absolute; inset: 0; pointer-events: none; --pointer-x: 0; --pointer-y: 0; }
+.farLayer, .middleLayer, .nearLayer { position: absolute; inset: -3%; pointer-events: none; will-change: transform; }
+.farLayer { z-index: 0; transform: translate3d(calc(var(--pointer-x) * -6px), calc(var(--pointer-y) * -6px), 0); }
+.middleLayer { z-index: 10; transform: translate3d(calc(var(--pointer-x) * -12px), calc(var(--pointer-y) * -12px), 0); overflow: hidden; }
+.nearLayer { z-index: 10; transform: translate3d(calc(var(--pointer-x) * -20px), calc(var(--pointer-y) * -20px), 0); overflow: hidden; }
+
+.particles { position: absolute; inset: 0; }
+.particles i { position: absolute; left: var(--x); top: var(--y); width: var(--size); height: var(--size); border-radius: 50%; background: rgba(200,244,241,.62); opacity: var(--opacity); filter: blur(var(--blur)); animation: particle-drift var(--duration) ease-in-out var(--delay) infinite alternate; }
+.bubble { position: absolute; left: var(--x); bottom: -35px; width: var(--size); height: var(--size); border: 1px solid rgba(220,255,255,.48); border-radius: 50%; background: radial-gradient(circle at 30% 25%,rgba(255,255,255,.62) 0 6%,rgba(174,246,250,.16) 16%,rgba(70,185,211,.07) 55%,transparent 72%); box-shadow: inset -2px -3px 8px rgba(10,104,145,.15),0 0 8px rgba(137,239,245,.12); opacity: var(--opacity); filter: blur(var(--blur)); animation: bubble-rise var(--duration) linear var(--delay) infinite; }
+.nearBubble { opacity: .28; filter: blur(1.25px); }
+.paused * { animation-play-state: paused !important; }
+@keyframes particle-drift { from { transform: translate3d(-5px,8px,0); } to { transform: translate3d(9px,-13px,0); } }
+@keyframes bubble-rise { 0% { transform: translate3d(0,0,0) scale(.8); opacity: 0; } 10%,85% { opacity: var(--opacity); } 50% { transform: translate3d(var(--sway),-58vh,0) scale(.94); } 100% { transform: translate3d(var(--sway-negative),-116vh,0) scale(1.08); opacity: 0; } }
+@media (max-width: 768px) { .middleLayer .bubble:nth-child(n+11), .particles i:nth-child(n+26), .nearLayer .bubble:nth-child(n+3) { display:none; } }
+@media (prefers-reduced-motion: reduce) { .root * { animation:none !important; } .farLayer,.middleLayer,.nearLayer { transform:none; } .bubble { opacity:.18; } }
