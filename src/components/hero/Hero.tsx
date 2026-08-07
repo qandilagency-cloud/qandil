@@ -26,10 +26,24 @@ export default function Hero() {
 
         <div className={styles.heroActions}>
           <a href="#contact" className={styles.heroPrimaryButton}>
-            ابدأ مشروعك
+            <span>ابدأ مشروعك</span>
+            <svg
+              className={styles.buttonChevron}
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
           </a>
           <a href="#works" className={styles.heroSecondaryButton}>
-            استكشف أعمالنا
+            <span>استكشف أعمالنا</span>
+            <svg
+              className={styles.buttonChevron}
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
           </a>
         </div>
       </div>

@@ -34,10 +34,13 @@ const LIME = "#D5F74C";
 const PURPLE = "#875CFF";
 const CORAL = "#FF719D";
 const WHITE = "#F4FAFF";
-const MAX_ROTATION_Y = THREE.MathUtils.degToRad(18);
-const MAX_ROTATION_X = THREE.MathUtils.degToRad(12);
-const MAX_ROTATION_Z = THREE.MathUtils.degToRad(6);
-const POINTER_SMOOTH_SPEED = 4.5;
+const MAX_ROTATION_Y = THREE.MathUtils.degToRad(12);
+const MAX_ROTATION_X = THREE.MathUtils.degToRad(8);
+const MAX_ROTATION_Z = THREE.MathUtils.degToRad(4);
+const POINTER_SMOOTH_SPEED = 4.2;
+const JELLY_LOCAL_TOP = 0.92;
+const JELLY_LOCAL_BOTTOM = 2.5;
+const JELLY_LOCAL_WIDTH = 2.36;
 
 type CompiledTitleShader = {
   uniforms: Record<string, { value: unknown }>;
@@ -222,7 +225,7 @@ function updateArm(
 
 export default function Jellyfish() {
   const reducedMotion = usePrefersReducedMotion();
-  const { viewport, size, camera, gl } = useThree();
+  const { size, camera, gl } = useThree();
   const drawingBufferSize = useMemo(() => new THREE.Vector2(), []);
   const titleShadersRef = useRef<CompiledTitleShader[]>([]);
   const titleCanvas = useMemo(
@@ -255,6 +258,9 @@ export default function Jellyfish() {
     hover: 0,
     pointerSpeed: 0,
     autoYaw: 0,
+    pointerX: 0,
+    pointerY: 0,
+    positioned: false,
     lastX: 0,
     lastY: 0,
     lastTime: 0,
@@ -265,6 +271,7 @@ export default function Jellyfish() {
   const chromeSilver = useMemo(() => new THREE.Color(CHROME_SILVER), []);
   const raycaster = useMemo(() => new THREE.Raycaster(), []);
   const projectedPosition = useMemo(() => new THREE.Vector3(), []);
+  const safeLayout = useRef({ headerBottom: 72, progressTop: size.height * 0.76 });
 
   const edgeUniforms = useMemo(
     () => ({
@@ -515,6 +522,28 @@ export default function Jellyfish() {
   }, []);
 
   useEffect(() => {
+    const measureSafeLayout = () => {
+      const hero = gl.domElement.closest("section");
+      const heroRect = hero?.getBoundingClientRect();
+      const headerRect = document.querySelector("header")?.getBoundingClientRect();
+      const progressRect = hero
+        ?.querySelector<HTMLElement>("[data-hero-progress]")
+        ?.getBoundingClientRect();
+
+      safeLayout.current.headerBottom = heroRect
+        ? Math.max(0, (headerRect?.bottom ?? heroRect.top + 72) - heroRect.top)
+        : 72;
+      safeLayout.current.progressTop = heroRect && progressRect
+        ? progressRect.top - heroRect.top
+        : size.height * 0.76;
+    };
+
+    measureSafeLayout();
+    window.addEventListener("resize", measureSafeLayout, { passive: true });
+    return () => window.removeEventListener("resize", measureSafeLayout);
+  }, [gl, size.height, size.width]);
+
+  useEffect(() => {
     const state = interaction.current;
     const coarsePointer = window.matchMedia("(pointer: coarse)");
     state.enabled = !coarsePointer.matches;
@@ -535,6 +564,8 @@ export default function Jellyfish() {
       }
       state.lastX = event.clientX;
       state.lastY = event.clientY;
+      state.pointerX = event.clientX;
+      state.pointerY = event.clientY;
       state.lastTime = now;
       state.inside = true;
     };
@@ -571,36 +602,6 @@ export default function Jellyfish() {
     const pointerState = interaction.current;
     const pointerActive = pointerState.enabled && pointerState.inside && !reducedMotion;
     const smooth = 1 - Math.exp(-POINTER_SMOOTH_SPEED * deltaTime);
-    const targetOffsetX = pointerActive ? pointerState.ndc.x : 0;
-    const targetOffsetY = pointerActive ? pointerState.ndc.y : 0;
-    const targetRotationX = pointerActive ? -pointerState.ndc.y * MAX_ROTATION_X : 0;
-    const targetRotationY = pointerActive ? pointerState.ndc.x * MAX_ROTATION_Y : 0;
-    const targetRotationZ = pointerActive ? -pointerState.ndc.x * MAX_ROTATION_Z : 0;
-
-    pointerState.offsetX += (targetOffsetX - pointerState.offsetX) * smooth;
-    pointerState.offsetY += (targetOffsetY - pointerState.offsetY) * smooth;
-    pointerState.rotationX += (targetRotationX - pointerState.rotationX) * smooth;
-    pointerState.rotationY += (targetRotationY - pointerState.rotationY) * smooth;
-    pointerState.rotationZ += (targetRotationZ - pointerState.rotationZ) * smooth;
-    pointerState.pointerSpeed +=
-      (0 - pointerState.pointerSpeed) * (1 - Math.exp(-4.5 * deltaTime));
-
-    const currentResponsivePixels =
-      size.width < 640
-        ? THREE.MathUtils.clamp(size.width * 0.58, 190, 270)
-        : size.width < 1024
-          ? THREE.MathUtils.clamp(size.width * 0.36, 260, 340)
-          : THREE.MathUtils.clamp(size.width * 0.3, 320, 460);
-    const responsivePixels =
-      size.width < 640
-        ? THREE.MathUtils.clamp(currentResponsivePixels * 0.55, 135, 190)
-        : size.width < 1024
-          ? THREE.MathUtils.clamp(currentResponsivePixels * 0.55, 180, 240)
-          : THREE.MathUtils.clamp(currentResponsivePixels * 0.55, 220, 300);
-    const worldPerPixel = viewport.height / size.height;
-    const scale = (responsivePixels * worldPerPixel * 0.5) * JELLYFISH_SCALE;
-    const baseX = 0;
-    const baseY = size.width < 760 ? 0.12 : 0.04;
     const perspectiveCamera = camera as THREE.PerspectiveCamera;
     const distanceFromCamera = Math.abs(
       perspectiveCamera.position.z - mouseFollowGroup.position.z
@@ -610,14 +611,112 @@ export default function Jellyfish() {
       Math.tan(THREE.MathUtils.degToRad(perspectiveCamera.fov / 2)) *
       distanceFromCamera;
     const visibleWidth = visibleHeight * perspectiveCamera.aspect;
-    const horizontalRange = visibleWidth * 0.38;
-    const verticalRange = visibleHeight * 0.34;
+    const worldPerPixel = visibleHeight / size.height;
+    const isMobile = size.width < 768;
+    const compactMotion = size.width < 520;
+    const usePointerTracking = pointerActive && !compactMotion;
+    const topMargin = isMobile ? 14 : THREE.MathUtils.clamp(size.height * 0.025, 16, 30);
+    const bottomMargin = isMobile ? 12 : THREE.MathUtils.clamp(size.height * 0.02, 14, 26);
+    const availableHeight = Math.max(
+      180,
+      safeLayout.current.progressTop -
+        safeLayout.current.headerBottom -
+        topMargin -
+        bottomMargin
+    );
+    const desktopHeightScale = THREE.MathUtils.clamp(
+      size.height / 900,
+      0.95,
+      1.28
+    );
+    const preferredHeight = isMobile
+      ? THREE.MathUtils.clamp(size.height * 0.29, 170, 250)
+      : THREE.MathUtils.clamp(440 * desktopHeightScale, 430, 560);
+    const jellyHeightPixels = Math.min(
+      preferredHeight,
+      availableHeight * (isMobile ? 0.52 : 0.96)
+    );
+    const scale =
+      (jellyHeightPixels / (JELLY_LOCAL_TOP + JELLY_LOCAL_BOTTOM)) *
+      worldPerPixel *
+      JELLYFISH_SCALE;
+    const jellyHalfWidthPixels =
+      (JELLY_LOCAL_WIDTH * 0.5 * scale) / worldPerPixel;
 
-    const floatY = Math.sin(time * FLOAT_SPEED) * FLOAT_DISTANCE * motion;
-    const floatX = Math.sin(time * 0.45) * 0.05 * motion;
+    const floatSafetyPixels = 8;
+    const desktopLeft =
+      size.width * 0.04 + jellyHalfWidthPixels + floatSafetyPixels;
+    const desktopRight =
+      size.width * 0.58 - jellyHalfWidthPixels - floatSafetyPixels;
+    const mobileCenterX = size.width * 0.5;
+    const mobileRangeX = Math.min(size.width * 0.08, 42);
+    const minCenterX = isMobile ? mobileCenterX - mobileRangeX : desktopLeft;
+    const maxCenterX = isMobile
+      ? mobileCenterX + mobileRangeX
+      : Math.max(desktopLeft, desktopRight);
+    const movementMinY = compactMotion
+      ? size.height * 0.24
+      : Math.max(
+          safeLayout.current.headerBottom + 20,
+          size.height * 0.16
+        );
+    const movementMaxY = compactMotion
+      ? size.height * 0.7
+      : size.height * 0.94;
+
+    // Observe the full viewport, but clamp the target to the jellyfish-only area.
+    const targetPixelX = usePointerTracking
+      ? THREE.MathUtils.clamp(pointerState.pointerX, minCenterX, maxCenterX)
+      : (minCenterX + maxCenterX) * 0.5;
+    const verticalCenter = (movementMinY + movementMaxY) * 0.5;
+    const amplifiedPointerY =
+      verticalCenter + (pointerState.pointerY - verticalCenter) * 1.15;
+    const targetPixelY = usePointerTracking
+      ? THREE.MathUtils.clamp(
+          amplifiedPointerY,
+          movementMinY,
+          movementMaxY
+        )
+      : verticalCenter;
+    const targetOffsetX = (targetPixelX / size.width - 0.5) * visibleWidth;
+    const targetOffsetY = (0.5 - targetPixelY / size.height) * visibleHeight;
+
+    if (!pointerState.positioned) {
+      pointerState.offsetX = targetOffsetX;
+      pointerState.offsetY = targetOffsetY;
+      pointerState.positioned = true;
+    }
+
+    const directionX = THREE.MathUtils.clamp(
+      (targetOffsetX - pointerState.offsetX) /
+        Math.max(visibleWidth * 0.09, 0.01),
+      -1,
+      1
+    );
+    const directionY = THREE.MathUtils.clamp(
+      (targetOffsetY - pointerState.offsetY) /
+        Math.max(visibleHeight * 0.09, 0.01),
+      -1,
+      1
+    );
+    const targetRotationX = -directionY * MAX_ROTATION_X;
+    const targetRotationY = directionX * MAX_ROTATION_Y;
+    const targetRotationZ = -directionX * MAX_ROTATION_Z;
+
+    pointerState.offsetX += (targetOffsetX - pointerState.offsetX) * smooth;
+    pointerState.offsetY += (targetOffsetY - pointerState.offsetY) * smooth;
+    pointerState.rotationX += (targetRotationX - pointerState.rotationX) * smooth;
+    pointerState.rotationY += (targetRotationY - pointerState.rotationY) * smooth;
+    pointerState.rotationZ += (targetRotationZ - pointerState.rotationZ) * smooth;
+    pointerState.pointerSpeed +=
+      (0 - pointerState.pointerSpeed) * (1 - Math.exp(-4.5 * deltaTime));
+
+    const floatY =
+      Math.sin(time * FLOAT_SPEED) * FLOAT_DISTANCE * 0.38 * motion;
+    const floatX = Math.sin(time * 0.45) * 0.018 * motion;
     mouseFollowGroup.position.set(
-      pointerState.offsetX * horizontalRange,
-      pointerState.offsetY * verticalRange,
+      pointerState.offsetX,
+      pointerState.offsetY,
       0
     );
     mouseFollowGroup.rotation.set(
@@ -626,8 +725,8 @@ export default function Jellyfish() {
       pointerState.rotationZ
     );
     group.position.set(
-      baseX + floatX - scroll * 0.16,
-      baseY + floatY + scroll * 0.32,
+      floatX - scroll * 0.08,
+      floatY + scroll * 0.12,
       0
     );
     group.rotation.x = -0.12;

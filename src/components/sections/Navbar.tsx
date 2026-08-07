@@ -40,15 +40,29 @@ export default function Navbar() {
         </a>
 
         <nav id="main-navigation" aria-label="التنقل الرئيسي">
-          {links.map(([label, href]) => (
-            <a key={href} href={href}>
+          {links.map(([label, href], index) => (
+            <a
+              key={href}
+              href={href}
+              className={`navLink ${index === 0 ? "navLinkActive" : ""}`}
+              aria-current={index === 0 ? "page" : undefined}
+            >
               {label}
             </a>
           ))}
         </nav>
 
         <div className="ctaCluster">
-          <a className="cta header-cta" href="#contact">ابدأ مشروعك</a>
+          <a className="cta header-cta" href="#contact">
+            <span>ابدأ مشروعك</span>
+            <svg
+              className="header-chevron"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </a>
         </div>
 
       </div>
@@ -56,28 +70,30 @@ export default function Navbar() {
       <style jsx>{`
         .navbar {
           position: fixed !important;
-          top: 0 !important;
-          right: 0 !important;
-          left: 0 !important;
-          z-index: 1000 !important;
-          width: 100%;
-          height: 72px !important;
-          min-height: 72px !important;
-          max-height: 72px !important;
+          top: 16px !important;
+          right: auto !important;
+          left: 50% !important;
+          z-index: 100 !important;
+          width: calc(100% - 72px);
+          max-width: 1760px;
+          height: 76px !important;
+          min-height: 76px !important;
+          max-height: 76px !important;
           padding-top: 0 !important;
           padding-bottom: 0 !important;
           margin: 0 !important;
-          transform: none !important;
+          transform: translateX(-50%) !important;
           box-sizing: border-box !important;
-          border-top: 0 !important;
+          overflow: hidden;
+          border: 1px solid rgba(255, 255, 255, 0.55) !important;
+          border-radius: 22px;
           outline: none;
-          background: rgba(255, 255, 255, 0.42) !important;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.62) !important;
+          background: rgba(235, 250, 250, 0.3) !important;
           box-shadow:
-            0 8px 30px rgba(5, 25, 50, 0.08),
-            inset 0 1px 0 rgba(255, 255, 255, 0.7) !important;
-          -webkit-backdrop-filter: blur(20px) saturate(145%) !important;
-          backdrop-filter: blur(20px) saturate(145%) !important;
+            0 12px 36px rgba(0, 19, 39, 0.12),
+            inset 0 1px 0 rgba(255, 255, 255, 0.45) !important;
+          -webkit-backdrop-filter: blur(20px) saturate(135%) !important;
+          backdrop-filter: blur(20px) saturate(135%) !important;
           transition:
             background-color 0.35s ease,
             backdrop-filter 0.35s ease,
@@ -89,11 +105,13 @@ export default function Navbar() {
           border-top: 0 !important;
         }
         .navbar.header-scrolled {
-          background: rgba(255, 255, 255, 0.68) !important;
-          border-bottom-color: rgba(255, 255, 255, 0.78) !important;
-          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
-          -webkit-backdrop-filter: blur(24px) saturate(155%);
-          backdrop-filter: blur(24px) saturate(155%);
+          background: rgba(235, 250, 250, 0.4) !important;
+          border-color: rgba(255, 255, 255, 0.62) !important;
+          box-shadow:
+            0 14px 40px rgba(0, 19, 39, 0.14),
+            inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+          -webkit-backdrop-filter: blur(22px) saturate(140%);
+          backdrop-filter: blur(22px) saturate(140%);
         }
         .inner {
           position: relative;
@@ -103,7 +121,7 @@ export default function Navbar() {
           width: min(calc(100% - 48px), 1200px);
           height: 100% !important;
           min-height: 0 !important;
-          max-height: 72px !important;
+          max-height: 76px !important;
           margin-inline: auto;
           padding-top: 0 !important;
           padding-bottom: 0 !important;
@@ -148,29 +166,35 @@ export default function Navbar() {
           justify-content: center;
           gap: clamp(18px, 2.2vw, 34px);
         }
-        nav > a,
-        nav > a:visited {
+        .navLink,
+        .navLink:visited,
+        .navLinkActive {
           position: relative;
           padding-block: 14px;
           color: #5f6875;
           font-size: 0.94rem;
           font-weight: 500;
+          text-decoration: none;
+          border-bottom: 0;
+          box-shadow: none;
           text-shadow: none;
           white-space: nowrap;
-          transition: color 0.22s ease;
+          transition: color 200ms ease;
         }
-        nav > a:hover,
-        nav > a:focus-visible {
-          color: #1450ff;
+        .navLink::after,
+        .navLinkActive::after {
+          display: none;
+          content: none;
         }
-        nav > a.active,
-        nav > a[aria-current="page"] {
+        .navLink:hover,
+        .navLink:focus-visible {
           color: #1450ff;
+          text-decoration: none;
         }
         .cta,
         .cta:visited {
           border: 1px solid #1450ff;
-          border-radius: 999px;
+          border-radius: 14px;
           background: #1450ff;
           color: #ffffff;
           font-weight: 700;
@@ -186,14 +210,32 @@ export default function Navbar() {
           justify-self: end;
           align-items: center;
           justify-content: center;
+          gap: 14px;
+          min-width: 190px;
           width: auto;
-          height: 48px !important;
-          min-height: 48px !important;
-          max-height: 48px !important;
-          padding: 0 26px !important;
+          height: 58px !important;
+          min-height: 58px !important;
+          max-height: 58px !important;
+          padding-inline: 24px !important;
           box-sizing: border-box;
           line-height: 1;
           white-space: nowrap;
+        }
+        .header-chevron {
+          width: 18px;
+          height: 18px;
+          flex: 0 0 auto;
+          fill: none;
+          stroke: currentColor;
+          stroke-width: 2.5;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+          color: #ffffff;
+          transition: transform 220ms ease;
+        }
+        .cta:hover .header-chevron,
+        .cta:focus-visible .header-chevron {
+          transform: translateX(-4px);
         }
         .ctaCluster {
           display: flex;
@@ -222,12 +264,21 @@ export default function Navbar() {
           outline-offset: 4px;
         }
         @media (max-width: 900px) {
+          .navbar {
+            top: 10px !important;
+            width: calc(100% - 20px);
+            height: 68px !important;
+            min-height: 68px !important;
+            max-height: 68px !important;
+            border-radius: 18px;
+          }
           .inner {
             display: flex;
             justify-content: space-between;
             width: calc(100% - 32px);
             height: 100%;
             min-height: 0;
+            max-height: 68px !important;
           }
           .header-logo {
             gap: 8px;
@@ -246,13 +297,8 @@ export default function Navbar() {
           }
         }
         @media (max-width: 768px) {
-          .navbar {
-            height: 62px !important;
-            min-height: 62px !important;
-            max-height: 62px !important;
-          }
           .inner {
-            max-height: 62px !important;
+            max-height: 68px !important;
             padding-top: 0;
             padding-bottom: 0;
           }

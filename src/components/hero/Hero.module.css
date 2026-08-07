@@ -4,7 +4,7 @@
   align-items: center;
   width: 100%;
   height: 100svh;
-  min-height: 650px;
+  min-height: 100svh;
   overflow: hidden;
   background: #dcebe8;
   isolation: isolate;
@@ -19,13 +19,14 @@
 }
 
 .heroContent {
-  position: relative;
+  position: absolute;
+  top: 50%;
+  right: clamp(24px, 6vw, 112px);
   z-index: 5;
-  width: min(900px, 92vw);
-  margin-right: clamp(24px, 7vw, 120px);
-  margin-left: auto;
+  width: min(44vw, 720px);
   direction: rtl;
   text-align: right;
+  transform: translateY(-50%);
 }
 
 .heroEyebrow {
@@ -40,7 +41,7 @@
   margin: 0;
   color: #050505;
   font-family: "Lama Sans", var(--font-cairo), "Cairo", sans-serif;
-  font-size: clamp(40px, 5.5vw, 72px);
+  font-size: clamp(40px, 4.25vw, 68px);
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.035em;
@@ -71,12 +72,13 @@
 
 .heroPrimaryButton,
 .heroSecondaryButton {
-  min-height: 50px;
-  padding: 0 26px;
-  border-radius: 999px;
+  height: 58px;
+  padding-inline: 24px;
+  border-radius: 14px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 14px;
   font-weight: 700;
   text-decoration: none;
   transition:
@@ -86,21 +88,61 @@
 }
 
 .heroPrimaryButton {
+  min-width: 190px;
   color: #ffffff;
   background: #1450ff;
   border: 1px solid #1450ff;
 }
 
 .heroSecondaryButton {
-  color: #1450ff;
-  background: rgba(255, 255, 255, 0.38);
-  border: 1px solid rgba(20, 80, 255, 0.42);
-  backdrop-filter: blur(14px);
+  min-width: 210px;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
 
 .heroPrimaryButton:hover,
 .heroSecondaryButton:hover {
   transform: translateY(-2px);
+}
+
+.heroPrimaryButton:hover {
+  background: #063ee6;
+  border-color: #063ee6;
+}
+
+.heroSecondaryButton:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: #ffffff;
+}
+
+.buttonChevron {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 220ms ease;
+}
+
+.heroPrimaryButton .buttonChevron {
+  color: #ffffff;
+}
+
+.heroSecondaryButton .buttonChevron {
+  color: #ffffff;
+}
+
+.heroPrimaryButton:hover .buttonChevron,
+.heroPrimaryButton:focus-visible .buttonChevron,
+.heroSecondaryButton:hover .buttonChevron,
+.heroSecondaryButton:focus-visible .buttonChevron {
+  transform: translateX(-4px);
 }
 
 .heroPrimaryButton:focus-visible,
@@ -130,21 +172,30 @@
 }
 
 @media (max-width: 1100px) {
+  .heroContent {
+    right: clamp(24px, 4vw, 48px);
+    width: 47vw;
+  }
+
   .heroTitle {
-    font-size: clamp(38px, 5.8vw, 58px);
+    font-size: clamp(36px, 4.8vw, 54px);
   }
 }
 
 @media (max-width: 768px) {
   .hero {
     align-items: flex-start;
-    min-height: 760px;
+    min-height: 100svh;
     padding-top: clamp(112px, 17vh, 150px);
   }
 
   .heroContent {
+    position: relative;
+    top: auto;
+    right: auto;
     width: calc(100% - 36px);
     margin-inline: 18px;
+    transform: none;
   }
 
   .heroTitle {

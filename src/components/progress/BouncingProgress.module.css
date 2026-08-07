@@ -3,9 +3,19 @@
   left: clamp(30px, 5vw, 90px);
   bottom: clamp(70px, 11vh, 130px);
   z-index: 6;
-  width: min(52vw, 950px);
-  height: 126px;
+  width: min(26vw, 475px);
+  height: 63px;
   pointer-events: none;
+}
+
+.bouncingProgress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 200%;
+  height: 200%;
+  transform: scale(0.66);
+  transform-origin: left bottom;
 }
 
 .progress {
@@ -150,11 +160,10 @@
 
 @media (max-width: 600px) {
   .section {
-    right: 16px;
     bottom: 20px;
     left: 16px;
-    width: auto;
-    height: 96px;
+    width: calc(50% - 16px);
+    height: 48px;
   }
   .progress { --jelly-width: 54px; }
   .jellyPosition { width: 54px; height: 82px; }
