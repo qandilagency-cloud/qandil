@@ -1,0 +1,175 @@
+.section {
+  position: absolute;
+  left: clamp(30px, 5vw, 90px);
+  bottom: clamp(70px, 11vh, 130px);
+  z-index: 6;
+  width: min(52vw, 950px);
+  height: 126px;
+  pointer-events: none;
+}
+
+.progress {
+  --jelly-width: clamp(58px, 6vw, 72px);
+  --endpoint-inset: calc(var(--jelly-width) / 2);
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+}
+
+.serviceLabel {
+  position: absolute;
+  top: calc(100% + 20px);
+  left: 0;
+  right: auto;
+  width: min(420px, 42vw);
+  direction: rtl;
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(22px, 2.2vw, 38px);
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: left;
+  text-shadow: 0 2px 12px rgba(0, 19, 39, 0.48);
+  transform: none;
+}
+
+.serviceActive {
+  display: block;
+  animation: service-enter 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.line {
+  position: absolute;
+  right: var(--endpoint-inset);
+  bottom: 22px;
+  left: var(--endpoint-inset);
+  height: 1px;
+  background: rgba(205, 235, 245, 0.22);
+}
+
+.step {
+  position: absolute;
+  top: 50%;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(205, 235, 245, 0.34);
+  transform: translate(-50%, -50%);
+  transition:
+    width 300ms ease,
+    height 300ms ease,
+    background-color 300ms ease,
+    opacity 300ms ease;
+}
+
+.stepActive {
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.dot {
+  position: absolute;
+  top: 50%;
+  right: auto;
+  left: var(--position);
+  z-index: 3;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #1450ff;
+  box-shadow: 0 0 12px rgba(20, 80, 255, 0.75);
+  transform: translate(-50%, -50%);
+  transition: left 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.jellyPosition {
+  position: absolute;
+  right: auto;
+  bottom: 26px;
+  left: 0;
+  z-index: 2;
+  width: var(--jelly-width);
+  height: 92px;
+  transform: translateX(0);
+}
+
+.jellyBounce {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 100%;
+}
+
+.jumping {
+  animation: jelly-jump 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.canvas {
+  position: absolute !important;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.shadow {
+  position: absolute;
+  bottom: -3px;
+  left: 50%;
+  width: 46px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(0, 7, 20, 0.42);
+  filter: blur(5px);
+  transform: translateX(-50%);
+}
+
+.jumping .shadow {
+  animation: shadow-jump 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes jelly-jump {
+  0% { transform: translateY(0) scaleX(1.05) scaleY(0.92); }
+  12% { transform: translateY(-12px) scaleX(0.98) scaleY(1.03); }
+  48% { transform: translateY(-68px) scaleX(1) scaleY(1); }
+  82% { transform: translateY(-8px) scaleX(0.99) scaleY(1.01); }
+  90% { transform: translateY(0) scaleX(1.05) scaleY(0.92); }
+  100% { transform: translateY(0) scaleX(1) scaleY(1); }
+}
+
+@keyframes shadow-jump {
+  0%, 90%, 100% { opacity: 0.72; transform: translateX(-50%) scaleX(1); }
+  48% { opacity: 0.22; transform: translateX(-50%) scaleX(0.48); }
+}
+
+@keyframes service-enter {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 600px) {
+  .section {
+    right: 16px;
+    bottom: 20px;
+    left: 16px;
+    width: auto;
+    height: 96px;
+  }
+  .progress { --jelly-width: 54px; }
+  .jellyPosition { width: 54px; height: 82px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot,
+  .jellyPosition,
+  .jellyBounce,
+  .shadow {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .serviceActive {
+    animation: none !important;
+  }
+}

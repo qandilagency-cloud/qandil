@@ -1,4 +1,5 @@
 import Scene from "@/components/scene/Scene";
+import BouncingProgress from "@/components/progress/BouncingProgress";
 import HeroBackground from "./HeroBackground";
 import OceanEffects from "./OceanEffects";
 import styles from "./Hero.module.css";
@@ -32,6 +33,8 @@ export default function Hero() {
           </a>
         </div>
       </div>
+
+      <BouncingProgress />
 
       <div className={styles.canvasLayer}>
         <Scene />
