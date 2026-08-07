@@ -11,7 +11,6 @@ const links = [
 ] as const;
 
 export default function Navbar() {
-  const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -40,37 +39,18 @@ export default function Navbar() {
           />
         </a>
 
-        <nav id="main-navigation" className={open ? "open" : ""} aria-label="التنقل الرئيسي">
+        <nav id="main-navigation" aria-label="التنقل الرئيسي">
           {links.map(([label, href]) => (
-            <a key={href} href={href} onClick={() => setOpen(false)}>
+            <a key={href} href={href}>
               {label}
             </a>
           ))}
-          <div className="mobileCtaCluster">
-            <a className="mobileCta" href="#contact" onClick={() => setOpen(false)}>
-              ابدأ مشروعك
-            </a>
-            <span className="ctaMarks" aria-hidden="true"><i /><i /><i /></span>
-          </div>
         </nav>
 
         <div className="ctaCluster">
-          <a className="cta" href="#contact">ابدأ مشروعك</a>
-          <span className="ctaMarks" aria-hidden="true"><i /><i /><i /></span>
+          <a className="cta header-cta" href="#contact">ابدأ مشروعك</a>
         </div>
 
-        <button
-          className={open ? "menu open" : "menu"}
-          type="button"
-          aria-label={open ? "إغلاق القائمة" : "فتح القائمة"}
-          aria-expanded={open}
-          aria-controls="main-navigation"
-          onClick={() => setOpen((value) => !value)}
-        >
-          <i />
-          <i />
-          <i />
-        </button>
       </div>
 
       <style jsx>{`
@@ -168,8 +148,8 @@ export default function Navbar() {
           justify-content: center;
           gap: clamp(18px, 2.2vw, 34px);
         }
-        nav > a:not(.mobileCta),
-        nav > a:not(.mobileCta):visited {
+        nav > a,
+        nav > a:visited {
           position: relative;
           padding-block: 14px;
           color: #5f6875;
@@ -179,18 +159,16 @@ export default function Navbar() {
           white-space: nowrap;
           transition: color 0.22s ease;
         }
-        nav > a:not(.mobileCta):hover,
-        nav > a:not(.mobileCta):focus-visible {
+        nav > a:hover,
+        nav > a:focus-visible {
           color: #1450ff;
         }
-        nav > a:not(.mobileCta).active,
-        nav > a:not(.mobileCta)[aria-current="page"] {
+        nav > a.active,
+        nav > a[aria-current="page"] {
           color: #1450ff;
         }
         .cta,
-        .cta:visited,
-        .mobileCta,
-        .mobileCta:visited {
+        .cta:visited {
           border: 1px solid #1450ff;
           border-radius: 999px;
           background: #1450ff;
@@ -208,59 +186,35 @@ export default function Navbar() {
           justify-self: end;
           align-items: center;
           justify-content: center;
-          height: 42px !important;
-          min-height: 42px !important;
-          padding: 0 24px !important;
+          width: auto;
+          height: 48px !important;
+          min-height: 48px !important;
+          max-height: 48px !important;
+          padding: 0 26px !important;
+          box-sizing: border-box;
+          line-height: 1;
           white-space: nowrap;
         }
-        .ctaCluster,
-        .mobileCtaCluster {
+        .ctaCluster {
           display: flex;
           direction: rtl;
           align-items: center;
           gap: 12px;
         }
-        .ctaMarks {
-          display: inline-flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          gap: 3px;
-          flex: 0 0 auto;
-          width: 22px;
-          height: 18px;
-          color: #1450ff;
-          pointer-events: none;
-        }
-        .ctaMarks i {
-          display: block;
-          width: 18px;
-          height: 2px;
-          border-radius: 999px;
-          background: currentColor;
-        }
         .cta:hover,
-        .mobileCta:hover,
-        .cta:focus-visible,
-        .mobileCta:focus-visible {
+        .cta:focus-visible {
           border-color: #063ee6;
           background: #063ee6;
           color: #ffffff;
           transform: translateY(-2px);
           box-shadow: 0 12px 30px rgba(20, 80, 255, 0.35);
         }
-        .cta:active,
-        .mobileCta:active {
+        .cta:active {
           transform: translateY(0) scale(0.98);
         }
-        .cta:focus-visible,
-        .mobileCta:focus-visible {
+        .cta:focus-visible {
           outline: 3px solid rgba(20, 80, 255, 0.35);
           outline-offset: 3px;
-        }
-        .mobileCtaCluster,
-        .menu {
-          display: none;
         }
         a:focus-visible,
         button:focus-visible {
@@ -287,69 +241,8 @@ export default function Navbar() {
             max-height: 32px !important;
             max-width: 36px;
           }
-          .ctaCluster { display: none; }
-          .menu {
-            display: grid;
-            place-content: center;
-            gap: 5px;
-            width: 44px;
-            height: 44px;
-            border: 1px solid rgba(20, 80, 255, 0.32);
-            border-radius: 50%;
-            background: transparent;
-            cursor: pointer;
-          }
-          .menu i {
-            width: 20px;
-            height: 2px;
-            border-radius: 2px;
-            background: #1450ff;
-            transition: transform 180ms ease, opacity 180ms ease;
-          }
-          .menu.open i:first-child { transform: translateY(7px) rotate(45deg); }
-          .menu.open i:nth-child(2) { opacity: 0; }
-          .menu.open i:last-child { transform: translateY(-7px) rotate(-45deg); }
           nav {
-            position: absolute;
-            top: calc(100% + 1px);
-            right: -16px;
-            left: -16px;
-            flex-direction: column;
-            align-items: stretch;
-            gap: 0;
-            padding: 10px 16px 22px;
-            background: rgba(255, 255, 255, 0.82);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.78);
-            box-shadow: 0 18px 30px rgba(5, 25, 50, 0.12);
-            -webkit-backdrop-filter: blur(26px) saturate(150%);
-            backdrop-filter: blur(26px) saturate(150%);
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-8px);
-            transition: opacity 180ms ease, transform 180ms ease, visibility 180ms ease;
-          }
-          nav.open {
-            opacity: 1;
-            visibility: visible;
-            transform: none;
-          }
-          nav > a:not(.mobileCta) {
-            padding: 15px 8px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            color: #5f6875;
-            text-shadow: none;
-          }
-          .mobileCta {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 13px 22px;
-            text-align: center;
-          }
-          .mobileCtaCluster {
-            display: flex;
-            justify-content: center;
-            margin-top: 18px;
+            display: none;
           }
         }
         @media (max-width: 768px) {
@@ -369,11 +262,6 @@ export default function Navbar() {
           }
           .header-logo-word {
             font-size: 1.3rem;
-          }
-          .cta,
-          .mobileCta {
-            min-height: 42px;
-            padding: 9px 18px;
           }
         }
         @media (prefers-reduced-motion: reduce) {

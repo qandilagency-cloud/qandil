@@ -36,7 +36,14 @@ export default function Scene() {
       dpr={[1, Math.min(1.5, tier.dpr[1])]}
       gl={{ antialias: tier.antialias, alpha: true, powerPreference: "high-performance" }}
       camera={{ position: [0, 0, 7.5], fov: 42, near: 0.1, far: 40 }}
-      style={{ position: "absolute", inset: 0, pointerEvents: "none" }}
+      style={{
+        position: "absolute",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        display: "block",
+        pointerEvents: "none",
+      }}
     >
       <VisibilityController />
       <SceneEnvironment />

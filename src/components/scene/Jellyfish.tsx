@@ -303,6 +303,7 @@ export default function Jellyfish() {
         alphaTest: 0,
         side: THREE.DoubleSide,
         depthWrite: true,
+        depthTest: true,
       }),
     []
   );
@@ -389,27 +390,39 @@ export default function Jellyfish() {
     const context = titleCanvas.getContext("2d");
     if (!context) return;
 
-    const scale = titleCanvas.width / size.width;
-    const mobile = size.width <= 768;
-    const cssFontSize = mobile
-      ? THREE.MathUtils.clamp(size.width * 0.15, 44, 82)
-      : THREE.MathUtils.clamp(size.width * 0.082, 58, 138);
-    const fontSize = cssFontSize * scale;
-    const lineHeight = fontSize * (mobile ? 1.16 : 1.04);
-    const centerY = titleCanvas.height * (mobile ? 0.53 : 0.54);
-    const lines = ["من عمق الفكرة", "نصنع علامة", "تضيء"];
-
     context.clearRect(0, 0, titleCanvas.width, titleCanvas.height);
+    const titleElement = document.querySelector("section h1");
+    if (!titleElement) return;
+    const rect = titleElement.getBoundingClientRect();
+    const computedStyle = window.getComputedStyle(titleElement);
+    const scale = titleCanvas.width / size.width;
+    const fontSize = Number.parseFloat(computedStyle.fontSize) * scale;
+    const lineHeight = Number.parseFloat(computedStyle.lineHeight) * scale;
+    const maxWidth = rect.width * scale;
+    const words = (titleElement.textContent || "").trim().split(/\s+/);
+    const lines: string[] = [];
+
     context.direction = "rtl";
-    context.textAlign = "center";
+    context.textAlign = "right";
     context.textBaseline = "middle";
     context.font = `700 ${fontSize}px "Cairo", sans-serif`;
-    context.fillStyle = "rgba(238, 255, 253, 0.96)";
+    context.fillStyle = "rgba(190, 220, 230, 0.28)";
+    words.forEach((word) => {
+      const candidate = lines.length ? `${lines[lines.length - 1]} ${word}` : word;
+      if (lines.length && context.measureText(candidate).width > maxWidth) {
+        lines.push(word);
+      } else if (lines.length) {
+        lines[lines.length - 1] = candidate;
+      } else {
+        lines.push(word);
+      }
+    });
+
     lines.forEach((line, index) => {
       context.fillText(
         line,
-        titleCanvas.width * 0.5,
-        centerY + (index - 1) * lineHeight
+        rect.right * scale,
+        rect.top * scale + lineHeight * (index + 0.5)
       );
     });
     titleTexture.needsUpdate = true;
@@ -417,7 +430,7 @@ export default function Jellyfish() {
 
   useEffect(() => {
     if (!titleTexture) return;
-    const materials = [bellMaterial, bodyMaterial];
+    const materials = [bellMaterial];
     titleShadersRef.current = [];
     materials.forEach((material) => {
       material.onBeforeCompile = (shader) => {
@@ -439,7 +452,7 @@ export default function Jellyfish() {
           .replace(
             "#include <opaque_fragment>",
             `vec2 titleScreenUv = gl_FragCoord.xy / uTitleResolution;
-            vec2 reflectionUv = vec2(1.0 - titleScreenUv.x, titleScreenUv.y);
+            vec2 reflectionUv = titleScreenUv;
             vec2 titleDistortion = normal.xy * uTitleRefraction;
             vec2 reflectedUv = reflectionUv + titleDistortion;
             vec4 titleCenter = (
@@ -458,15 +471,19 @@ export default function Jellyfish() {
               uTitleTexture,
               reflectionUv + titleDistortion * 0.88 - normal.xy * uTitleChromatic
             ).b;
-            float titleMask = max(titleCenter.a, max(titleRed, max(titleGreen, titleBlue)));
+            float titleMask = smoothstep(0.015, 0.18, titleCenter.a);
             vec3 reflectedTitle = vec3(titleRed, titleGreen, titleBlue);
             vec3 reflectionTint = reflectedTitle * vec3(0.58, 0.82, 0.92);
-            outgoingLight += reflectionTint * titleMask * 0.42;
+            outgoingLight = mix(
+              outgoingLight,
+              reflectionTint,
+              clamp(titleMask * 0.32, 0.0, 0.32)
+            );
             #include <opaque_fragment>`
           );
         titleShadersRef.current.push(shader as CompiledTitleShader);
       };
-      material.customProgramCacheKey = () => "qandil-title-refraction-v1";
+      material.customProgramCacheKey = () => "qandil-title-refraction-v2";
       material.needsUpdate = true;
     });
 
@@ -478,7 +495,7 @@ export default function Jellyfish() {
       });
       titleShadersRef.current = [];
     };
-  }, [bellMaterial, bodyMaterial, gl, size.width, size.height, titleTexture]);
+  }, [bellMaterial, gl, size.width, size.height, titleTexture]);
 
   const anchorY = useMemo(() => {
     const point = new THREE.Vector2();
